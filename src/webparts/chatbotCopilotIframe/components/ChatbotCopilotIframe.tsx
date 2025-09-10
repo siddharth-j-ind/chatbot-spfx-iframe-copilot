@@ -123,9 +123,9 @@ export default class ChatbotCopilotIframe extends React.Component<IChatbotCopilo
         
         {/* Magic smoke effect */}
         <div className={styles.magicSmoke}>
-          <div className={styles.smoke}></div>
-          <div className={styles.smoke}></div>
-          <div className={styles.smoke}></div>
+          <div className={styles.smoke} />
+          <div className={styles.smoke} />
+          <div className={styles.smoke} />
         </div>
       </div>
     );
