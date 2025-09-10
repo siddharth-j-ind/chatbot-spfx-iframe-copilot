@@ -1,15 +1,15 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "chatbot-spfx-iframe-copilot-client-side-solution",
+    "name": "ivl-indogenie-chatbot",
     "id": "ff548926-9582-41af-9502-ec0ae3dfceb8",
     "version": "1.0.0.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
     "developer": {
-      "name": "",
-      "websiteUrl": "",
+      "name": "Siddharth Joshi",
+      "websiteUrl": "siddharthjoshi.tech",
       "privacyUrl": "",
       "termsOfUseUrl": "",
       "mpnId": "Undefined-1.21.1"
@@ -35,6 +35,6 @@
     ]
   },
   "paths": {
-    "zippedPackage": "solution/chatbot-spfx-iframe-copilot.sppkg"
+    "zippedPackage": "solution/ivl-indogenie-chatbot.sppkg"
   }
 }
