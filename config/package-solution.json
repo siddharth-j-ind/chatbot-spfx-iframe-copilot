@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "chatbot-spfx-iframe-copilot-client-side-solution",
+    "id": "ff548926-9582-41af-9502-ec0ae3dfceb8",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.21.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "chatbot-spfx-iframe-copilot description"
+      },
+      "longDescription": {
+        "default": "chatbot-spfx-iframe-copilot description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "chatbot-spfx-iframe-copilot Feature",
+        "description": "The feature that activates elements of the chatbot-spfx-iframe-copilot solution.",
+        "id": "446839d5-dab2-459a-b804-009e636a89e1",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/chatbot-spfx-iframe-copilot.sppkg"
+  }
+}

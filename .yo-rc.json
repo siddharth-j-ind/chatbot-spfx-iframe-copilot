@@ -1,0 +1,18 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "16.20.2",
+    "sdksVersions": {},
+    "version": "1.21.1",
+    "libraryName": "chatbot-spfx-iframe-copilot",
+    "libraryId": "ff548926-9582-41af-9502-ec0ae3dfceb8",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "chatbot-spfx-iframe-copilot",
+    "solutionShortDescription": "chatbot-spfx-iframe-copilot description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
