@@ -162,7 +162,7 @@ export default class ChatbotCopilotIframe extends React.Component<IChatbotCopilo
                 <div className={styles.avatarSmall}>
                   {this.renderSmallGenieLamp()}
                 </div>
-                <span>Genie Assistant</span>
+                <span>IndoGenie</span>
               </div>
               <button 
                 className={styles.closeButton}
