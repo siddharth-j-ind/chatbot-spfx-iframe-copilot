@@ -327,11 +327,14 @@
   transform-origin: bottom right;
   border: 2px solid rgba(218, 165, 32, 0.2);
   
-  // Smoothened emergence animation
-  animation: genieEmergence 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  // Remove default animation to prevent double pop-up
+  
+  &.opening {
+    animation: smoothGenieOpen 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
 
-  &.emerging {
-    animation: genieEmergenceEnhanced 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  &.closing {
+    animation: smoothGenieClose 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
   }
 
   @media (max-width: 480px) {
@@ -342,6 +345,47 @@
   }
 }
 
+// Smooth single opening animation - no double pop-up
+@keyframes smoothGenieOpen {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(20px) rotate(-5deg);
+    filter: blur(4px) brightness(1.3);
+  }
+  30% {
+    opacity: 0.7;
+    transform: scale(0.85) translateY(-5px) rotate(2deg);
+    filter: blur(2px) brightness(1.15);
+  }
+  60% {
+    opacity: 0.95;
+    transform: scale(1.02) translateY(-2px) rotate(-1deg);
+    filter: blur(0px) brightness(1.05);
+  }
+  80% {
+    transform: scale(0.99) translateY(1px) rotate(0.5deg);
+    filter: blur(0px) brightness(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotate(0deg);
+    filter: blur(0px) brightness(1);
+  }
+}
+
+// Smooth closing animation - gentle fade out, no pop-up
+@keyframes smoothGenieClose {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px) rotate(1deg);
+  }
+}
+
+// Keep old animations for backward compatibility but they won't be used
 // Smoothened genie emergence from lamp
 @keyframes genieEmergence {
   0% {
@@ -470,6 +514,39 @@
   height: 100%;
   border: none;
   background: white;
+}
+
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  backdrop-filter: blur(2px);
+  border-radius: 0 0 18px 18px;
+}
+
+.loadingSpinner {
+  text-align: center;
+  font-size: 14px;
+  color: #DAA520;
+  font-weight: 600;
+  animation: pulse 1.5s ease-in-out infinite;
+  padding: 20px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 // Legacy styles cleanup - keeping for compatibility if needed

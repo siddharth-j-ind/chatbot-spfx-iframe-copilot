@@ -1,47 +1,154 @@
 import * as React from 'react';
+import { AadHttpClient, HttpClientResponse } from '@microsoft/sp-http';
 import styles from './ChatbotCopilotIframe.module.scss';
 import type { IChatbotCopilotIframeProps } from './IChatbotCopilotIframeProps';
 
 interface IChatbotState {
   isOpen: boolean;
-  isAnimating: boolean; // Track animation state for magical effects
+  isAnimating: boolean;
+  isLoadingAuth: boolean; // Add loading state for authentication
+  isClosing: boolean; // Track closing animation
 }
 
 export default class ChatbotCopilotIframe extends React.Component<IChatbotCopilotIframeProps, IChatbotState> {
+  private iframeRef: React.RefObject<HTMLIFrameElement>;
+
   constructor(props: IChatbotCopilotIframeProps) {
     super(props);
     this.state = {
       isOpen: false,
-      isAnimating: false
+      isAnimating: false,
+      isLoadingAuth: false,
+      isClosing: false
     };
+    this.iframeRef = React.createRef();
   }
 
   private toggleChatWindow = (): void => {
     if (this.state.isAnimating) return; // Prevent multiple clicks during animation
     
-    this.setState({ isAnimating: true });
-    
     if (!this.state.isOpen) {
-      // Opening - show chat window with genie emergence animation
-      this.setState({ isOpen: true });
+      // Opening - smooth single emergence animation
+      this.setState({ 
+        isOpen: true, 
+        isAnimating: true, 
+        isLoadingAuth: true,
+        isClosing: false 
+      });
+      
+      // Authenticate and send token to iframe
+      this.authenticateAndSendToken().catch((error) => {
+        console.error('Authentication failed:', error);
+        this.setState({ isLoadingAuth: false });
+      });
+      
       setTimeout(() => {
         this.setState({ isAnimating: false });
-      }, 800); // Match enhanced animation duration
+      }, 600); // Match smooth animation duration
     } else {
-      // Closing - reverse animation
+      // Closing - gentle fade out
+      this.setState({ 
+        isAnimating: true, 
+        isClosing: true,
+        isLoadingAuth: false 
+      });
       setTimeout(() => {
-        this.setState({ isOpen: false, isAnimating: false });
-      }, 400);
+        this.setState({ 
+          isOpen: false, 
+          isAnimating: false, 
+          isClosing: false 
+        });
+      }, 300); // Faster, smoother close
     }
   };
 
   private closeChatWindow = (): void => {
     if (this.state.isAnimating) return;
     
-    this.setState({ isAnimating: true });
+    this.setState({ 
+      isAnimating: true, 
+      isClosing: true,
+      isLoadingAuth: false 
+    });
     setTimeout(() => {
-      this.setState({ isOpen: false, isAnimating: false });
-    }, 400);
+      this.setState({ 
+        isOpen: false, 
+        isAnimating: false, 
+        isClosing: false 
+      });
+    }, 300);
+  };
+
+  private authenticateAndSendToken = async (): Promise<void> => {
+    try {
+      // Get the webpart context
+      const webPartContext = this.props.context;
+      
+      if (webPartContext && webPartContext.aadHttpClientFactory) {
+        // Use the exact approach specified - get AadHttpClient for Auth App scope
+        webPartContext.aadHttpClientFactory
+          .getClient('api://9b803392-0d97-431e-9230-caceb723777e')
+          .then((client: AadHttpClient) => {
+            // Make a dummy call to establish the client connection
+            client.get('https://graph.microsoft.com/v1.0/me', AadHttpClient.configurations.v1)
+              .then((response: HttpClientResponse) => {
+                // Now get the token using aadTokenProviderFactory
+                return webPartContext.aadTokenProviderFactory
+                  .getTokenProvider()
+                  .then(provider => provider.getToken('api://9b803392-0d97-431e-9230-caceb723777e/.default'))
+                  .then(token => {
+                    // Wait for iframe to load, then send token
+                    const checkIframeAndSendToken = (): void => {
+                      const iframe = this.iframeRef.current;
+                      if (iframe && iframe.contentWindow) {
+                        try {
+                          // Send the token to the iframe exactly as specified
+                          iframe.contentWindow.postMessage({ 
+                            token: token,
+                            type: 'AUTH_TOKEN',
+                            userInfo: {
+                              displayName: webPartContext.pageContext.user.displayName,
+                              loginName: webPartContext.pageContext.user.loginName,
+                              email: webPartContext.pageContext.user.email
+                            }
+                          }, '*');
+                          
+                          this.setState({ isLoadingAuth: false });
+                          console.log('SSO Token sent to Copilot iframe successfully', {
+                            tokenLength: token?.length || 0,
+                            user: webPartContext.pageContext.user.displayName
+                          });
+                        } catch (error) {
+                          console.error('Failed to send token to iframe:', error);
+                          this.setState({ isLoadingAuth: false });
+                        }
+                      } else {
+                        // Retry after a short delay if iframe not ready
+                        setTimeout(checkIframeAndSendToken, 100);
+                      }
+                    };
+
+                    // Start checking for iframe
+                    setTimeout(checkIframeAndSendToken, 500);
+                  });
+              })
+              .catch((error) => {
+                console.error('AadHttpClient request failed:', error);
+                this.setState({ isLoadingAuth: false });
+              });
+          })
+          .catch((error) => {
+            console.error('Failed to get AadHttpClient:', error);
+            this.setState({ isLoadingAuth: false });
+          });
+      } else {
+        console.warn('AadHttpClientFactory not available in context');
+        this.setState({ isLoadingAuth: false });
+      }
+    } catch (error) {
+      console.error('Authentication setup failed:', error);
+      this.setState({ isLoadingAuth: false });
+    }
   };
 
   private renderGenieLamp = (): React.ReactElement => {
@@ -150,19 +257,19 @@ export default class ChatbotCopilotIframe extends React.Component<IChatbotCopilo
   };
 
   public render(): React.ReactElement<IChatbotCopilotIframeProps> {
-    const { isOpen, isAnimating } = this.state;
+    const { isOpen, isAnimating, isLoadingAuth, isClosing } = this.state;
 
     return (
       <div className={styles.chatbotContainer}>
-        {/* Chat Window - emerges from lamp */}
+        {/* Chat Window - smooth single emergence */}
         {isOpen && (
-          <div className={`${styles.chatWindow} ${isAnimating ? styles.emerging : ''}`}>
+          <div className={`${styles.chatWindow} ${isAnimating && !isClosing ? styles.opening : ''} ${isClosing ? styles.closing : ''}`}>
             <div className={styles.chatHeader}>
               <div className={styles.chatTitle}>
                 <div className={styles.avatarSmall}>
                   {this.renderSmallGenieLamp()}
                 </div>
-                <span>IndoGenie</span>
+                <span>IndoGenie {isLoadingAuth && '(Authenticating...)'}</span>
               </div>
               <button 
                 className={styles.closeButton}
@@ -173,11 +280,22 @@ export default class ChatbotCopilotIframe extends React.Component<IChatbotCopilo
               </button>
             </div>
             <div className={styles.chatBody}>
+              {isLoadingAuth && (
+                <div className={styles.loadingOverlay}>
+                  <div className={styles.loadingSpinner}>🔐 Securing your session...</div>
+                </div>
+              )}
               <iframe 
+                id="copilot-iframe"
+                ref={this.iframeRef}
                 src="https://web.powerva.microsoft.com/environments/Default-64f77dc5-3c66-462b-a765-7e07b045624a/bots/crab7_debby/webchat?__version__=2"
                 frameBorder="0"
                 className={styles.chatIframe}
                 title="Genie Chatbot"
+                onLoad={() => {
+                  // Iframe loaded, token will be sent via authenticateAndSendToken
+                  console.log('Copilot iframe loaded, ready for SSO token');
+                }}
               />
             </div>
           </div>

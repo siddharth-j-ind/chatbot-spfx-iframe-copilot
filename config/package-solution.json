@@ -3,7 +3,7 @@
   "solution": {
     "name": "ivl-indogenie-chatbot",
     "id": "ff548926-9582-41af-9502-ec0ae3dfceb8",
-    "version": "1.0.0.0",
+    "version": "2.0.1.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
